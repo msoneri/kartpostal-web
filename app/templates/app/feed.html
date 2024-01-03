@@ -1,0 +1,192 @@
+{% extends "app/base.html" %}
+
+{% block title %}
+    Feed
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 flex">
+  {% include "app/navbar.html" %}
+  <main class="w-3/5 px-4 py-8">
+    <div class="rounded-lg bg-[#333333] p-4 space-y-4">
+        <div id="messageContainer" style="display: none;">
+            <ul class="messages" id="messagesList"></ul>
+        </div>
+        <form method="post" id="postForm" enctype="multipart/form-data" action="/api/posts/create/">
+            {% csrf_token %}
+            <div class="flex items-center">
+                <input
+                    placeholder="What's happening?"
+                    class="w-4/5 md:w-3/5 lg:w-2/5 rounded-lg bg-[#222222] p-2 text-sm placeholder-gray-400 border border-gray-400 mr-2"
+                    type="text"
+                    name="post_text"
+                />
+                <div class="relative">
+                    <input
+                        type="file"
+                        name="image"
+                        class="absolute opacity-0 top-0 left-0 w-full h-full cursor-pointer"
+                    />
+                    <button type="button" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                        Choose Image
+                    </button>
+                </div>
+                <input type="hidden" name="user" value="{{ request.user.username }}">
+                <button type="button" id="submitPost" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 ml-2">Post</button>
+            </div>
+        </form>
+        
+      <br>
+      <br>
+        
+      <div class="" id="postsContainer">
+    
+      </div>
+
+      <!-- <div class="flex space-x-4">
+        <img
+          src="{% static 'images/kartpostal.png' %}"
+          alt="post image"
+          class="w-24 h-24 rounded-sm"
+          width="48"
+          height="48"
+          style="aspect-ratio: 48 / 48; object-fit: cover;"
+        />
+        <div>
+          <p class="text-sm">@admin · 2 days ago</p>
+          <p>Check out this cute duck!</p>
+        </div>
+      </div> -->
+    </div>
+  </main>
+</div>
+
+<script>
+  document.getElementById('submitPost').addEventListener('click', function(event) {
+  event.preventDefault();
+
+  const formData = new FormData(document.getElementById('postForm'));
+
+  fetch('/api/posts/create/', {
+    method: 'POST',
+    body: formData,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then((data) => {
+      // Handle successful response
+      console.log(data);
+      showMessage("Posted succesfully.", 'success');
+      // Optionally, perform actions after posting the data
+    })
+    .catch((error) => {
+      // Handle errors
+      console.error('There was an error!', error);
+      showMessage("An error occured.", 'error');
+    });
+});
+
+function showMessage(message, type) {
+    messagesList.innerHTML = `<li class="${type}">${message}</li>`;
+    messageContainer.style.display = 'block';
+}
+</script>
+
+<script>
+let page = 1; // Initial page number
+let isLoading = false;
+
+// Function to fetch and load more posts
+function loadMorePosts() {
+    if (!isLoading) {
+        isLoading = true;
+        fetch(`/api/posts/?page=${page}`)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (data && data.results && Array.isArray(data.results)) {
+                    console.log(data);
+                    displayPosts(data.results); // Update to use data.results array
+                    page++; // Increment the page number for the next load
+                } else {
+                    throw new Error('Invalid data format');
+                }
+                isLoading = false;
+            })
+            .catch((error) => {
+                console.error('There was an error!', error);
+                isLoading = false;
+            });
+    }
+}
+
+// Function to display posts
+function displayPosts(posts) {
+    const formatDate = (dateString) => {
+      const options = { 
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      };
+    
+      const formattedDate = new Date(dateString).toLocaleString('en-GB', options);
+      return formattedDate;
+    }; 
+
+    const postsContainer = document.getElementById('postsContainer');
+
+    posts.reverse().forEach((post) => {
+        const postDiv = document.createElement('div');
+        postDiv.classList.add('border', 'border-indigo-500/75', 'p-4', 'mb-4', 'rounded-xl', 'flex', 'space-x-4');
+        postDiv.style.cursor = 'pointer'
+
+        const img = document.createElement('img');
+        img.src = post.image ? post.image : '';
+        img.alt = 'post image';
+        img.classList.add('w-24', 'h-24', 'rounded-sm', 'mr-4');
+        img.width = '48';
+        img.height = '48';
+        img.style = 'aspect-ratio: 48 / 48; object-fit: cover;';
+
+        const postDetailsDiv = document.createElement('div');
+
+        const usernameP = document.createElement('p');
+
+        postDate = formatDate(post.post_date);
+        usernameP.textContent = `@${post.user} · ${postDate}`;
+        usernameP.classList.add('text-sm');
+
+        const postTextP = document.createElement('p');
+        postTextP.textContent = post.post_text;
+
+        postDetailsDiv.appendChild(usernameP);
+        postDetailsDiv.appendChild(postTextP);
+
+        postDiv.appendChild(img);
+        postDiv.appendChild(postDetailsDiv);
+
+        postDiv.addEventListener('click', function() {
+            window.location.href = `/post/${post.post_id}/`;
+        });
+
+        postsContainer.appendChild(postDiv);
+    });
+}
+
+    // Load initial posts
+    loadMorePosts();
+</script>
+{% endblock %}

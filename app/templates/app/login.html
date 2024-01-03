@@ -1,0 +1,110 @@
+{% extends "app/base.html" %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% load static %}
+
+{% if user.is_authenticated %}
+    <script>
+        // Redirect the user if authenticated
+        window.location.href = '/feed';
+    </script>
+{% endif %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="mt-5">
+                <div class="card-body">
+                    <form id="loginForm">
+                        <!-- Logo -->
+                        <img src="{% static 'images/kartpostal.png' %}" alt="Kartpostal Logo" class="mb-4">
+
+                        <!-- Welcome message -->
+                        <p class="mb-9">Welcome back, You've been missed</p>
+
+                        <!-- Email input -->
+                        <div class="form-group mb-3">
+                            <input type="username" class="form-control" name="username" placeholder="Username">
+                        </div>
+
+                        <!-- Password input -->
+                        <div class="form-group mb-3">
+                            <input type="password" class="form-control" name="password" placeholder="Password">
+                        </div>
+
+                        <!-- Sign in button -->
+                        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+
+                        <!-- Go to register page -->
+                        <div class="mt-3 text-center">
+                            <p class="text-muted">Not a Member? <a href="{% url 'app:login' %}" class="font-weight-bold">Register Now</a></p>
+                        </div>
+                    </form>
+
+                    <!-- Messages container -->
+                    <div id="messageContainer" style="display: none;">
+                        <ul class="messages" id="messagesList"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const messageContainer = document.getElementById('messageContainer');
+        const messagesList = document.getElementById('messagesList');
+
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(loginForm);
+            const data = {
+                username: formData.get('username'),
+                password: formData.get('password')
+            };
+
+            try {
+                const response = await fetch('/api/login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    // Handle successful login
+                    const responseData = await response.json();
+                    console.log(responseData); // Process the response accordingly
+
+                    // Show success message
+                    showMessage(responseData.message, 'success');
+
+                    // Redirect after 1 second
+                    setTimeout(() => {
+                        window.location.href = '/feed';
+                    }, 1000);
+                } else {
+                    // Handle authentication failure
+                    console.error('Login failed');
+
+                    // Show error message
+                    const errorData = await response.json();
+                    showMessage(errorData.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error during login:', error);
+            }
+        });
+
+        // Function to display messages
+        function showMessage(message, type) {
+            messagesList.innerHTML = `<li class="${type}">${message}</li>`;
+            messageContainer.style.display = 'block';
+        }
+    </script>
+{% endblock %}
