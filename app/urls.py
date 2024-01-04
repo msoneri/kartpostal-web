@@ -2,6 +2,7 @@ from django.urls import path, include
 from . import views
 from rest_framework import routers
 
+app_name='api'
 urlpatterns = [
     # path('login', views.login, name='login'),
     # Users endpoints
@@ -13,8 +14,8 @@ urlpatterns = [
     path('posts/<int:pk>/', views.PostsRetrieveUpdateDestroyAPIView.as_view(), name='posts-detail'),
     
     # Comments endpoints
-    path('comments/', views.CommentsListCreateAPIView.as_view(), name='comments-list'),
-    path('comments/<int:pk>/', views.CommentsRetrieveUpdateDestroyAPIView.as_view(), name='comments-detail'),
+    # path('comments/', views.CommentsListCreateAPIView.as_view(), name='comments-list'),
+    path('comments/<int:pk>/', views.CommentsListCreateAPIView.as_view(), name='comments-detail'),
     
     # Friends endpoints
     path('friends/', views.FriendsListCreateAPIView.as_view(), name='friends-list'),
@@ -25,5 +26,7 @@ urlpatterns = [
     path('logout/', views.LogoutAPIView.as_view(), name='api-logout'),
     
     path('posts/create/', views.PostsCreateAPIView.as_view(), name='posts-create'),
+    
+    path('posts/<int:post_id>/comments/', views.CreateCommentAPIView.as_view(), name='post-comments'),
 
 ]

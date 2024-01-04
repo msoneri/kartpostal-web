@@ -1,0 +1,47 @@
+{% extends "app/base.html" %}
+
+{% block title %}
+    Post Details
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 flex">
+  
+<!-- <div class="min-h-screen bg-[#121212] text-white"> -->
+    {% include "app/navbar.html" %}
+    <main class="flex-1 pl-32 pr-32 pt-16"></main>
+      <div class="flex flex-col items-center space-y-4">
+        <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
+          <img
+            class="aspect-square h-full w-full"
+            alt="Profile picture"
+            src="/static/profile_pictures/1eya4lVF_400x400.jpg?height=128&amp;width=128"
+          />
+        </span>
+        <div class="text-right">
+          <div class="text-lg font-semibold">admin</div>
+          <div class="text-sm">Mustafa Soner Işık</div>
+        </div>
+        <div class="space-y-2">
+          <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary-foreground h-10 px-4 py-2 bg-blue-600 hover:bg-blue-700">
+            Edit profile
+          </button>
+          <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary-foreground h-10 px-4 py-2 bg-blue-600 hover:bg-blue-700">
+            View friends
+          </button>
+        </div>
+        <img
+          src="/static/profile_pictures/1eya4lVF_400x400.jpg"
+          alt="Profile Picture"
+          class="rounded-full"
+          width="128"
+          height="128"
+          style="aspect-ratio: 128 / 128; object-fit: cover;"
+        />
+      </div>
+    </div>
+  </div>
+</main>
+  {% endblock %}
