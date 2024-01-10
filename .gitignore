@@ -1,3 +1,4 @@
 db.sqlite3
 dbcopy.sqlite3
 static/post_images/*
+static/profile_pictures/*
