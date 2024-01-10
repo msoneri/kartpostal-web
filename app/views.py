@@ -57,7 +57,6 @@ class CommentsListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = CommentsSerializer
 
     def get_queryset(self):
-        print(self.kwargs)
         post_id = self.kwargs['pk'] 
         return Comments.objects.filter(post=post_id)
 
@@ -196,10 +195,12 @@ def post_view(request, pk):
         if comments_response.status_code == 200:
             comments_data = comments_response.json()
             comments_results = comments_data.get('results', [])
-            print(comments_results)
             formatted_comments = []
 
             for comment in comments_results:
+                userid = comment.get('user', '')
+                user = get_object_or_404(CustomUser, id=userid)
+
                 comment_date_str = comment.get('comment_date', '')
                 print(comment_date_str)
                 if comment_date_str.endswith('Z'):
@@ -209,6 +210,7 @@ def post_view(request, pk):
                 formatted_date = comment_date.strftime('%d/%m/%Y %H:%M')
 
                 comment['comment_date'] = formatted_date
+                comment['username'] = user.username
                 formatted_comments.append(comment)
 
             return render(request, 'app/post.html', {'post': post_data, 'comments': formatted_comments})
@@ -225,4 +227,39 @@ def register_view(request):
 
 @login_required(login_url='/login')
 def profile_view(request, username):
-    return render(request, 'app/profile.html')
+    # Fetch user details using the provided username
+    user = get_object_or_404(CustomUser, username=username)
+    
+    # Retrieve posts related to the user
+    user_posts = Posts.objects.filter(user=user)
+    
+    # Pass user details and posts to the template for rendering
+    return render(request, 'app/profile.html', {'user': user, 'user_posts': user_posts})
+
+
+@login_required(login_url='/login')
+def profile_my(request):
+    user = get_object_or_404(CustomUser, username=request.user)
+    return profile_view(request, user.username)
+
+@login_required(login_url='/login')
+def edit_profile_view(request):
+    user = request.user  # Fetch the current logged-in user
+
+    if request.method == 'POST':
+        profile_picture = request.FILES.get('profile_picture')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        bio = request.POST.get('bio')
+
+        # Update user profile fields
+        user.profile_picture = profile_picture if profile_picture else user.profile_picture
+        user.first_name = first_name if first_name else user.first_name
+        user.last_name = last_name if last_name else user.last_name
+        user.bio = bio if bio else user.bio
+
+        user.save()
+        messages.success(request, 'Your profile has been updated successfully.')
+        return redirect('app:profile_my')  # Redirect to the profile view after successful update
+
+    return render(request, 'app/edit_profile.html', {'user': user})
