@@ -1,0 +1,45 @@
+{% extends "app/base.html" %}
+
+{% block title %}
+    Edit Profile
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 flex">
+  {% include "app/navbar.html" %}
+  <main class="flex flex-col justify-center ml-48 p-6">
+    <form method="post" enctype="multipart/form-data" class="max-w-md mx-auto rounded-lg p-8">
+      {% csrf_token %}
+      <!-- Profile Picture -->
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="profile_picture">Profile Picture</label>
+        <input type="file" name="profile_picture" id="profile_picture" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+      </div>
+
+      <!-- First Name -->
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="first_name">First Name</label>
+        <input type="text" name="first_name" id="first_name" value="{{ user.first_name }}" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+      </div>
+
+      <!-- Last Name -->
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="last_name">Last Name</label>
+        <input type="text" name="last_name" id="last_name" value="{{ user.last_name }}" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+      </div>
+
+      <!-- Bio -->
+      <div class="mb-6">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="bio">Bio</label>
+        <textarea name="bio" id="bio" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ user.bio }}</textarea>
+      </div>
+
+      <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        Save Changes
+      </button>
+    </form>
+  </main>
+</div>
+{% endblock %}

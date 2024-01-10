@@ -49,7 +49,7 @@
             {% for comment in comments %}
               <div class="border-t border-gray-200 pt-4">
                 <p class="text-sm">
-                  <span class="font-bold text-gray-800 mr-2">@{{ comment.user.username }}</span>
+                  <span class="font-bold text-gray-800 mr-2"><a href="{% url 'app:profile' comment.username %}">@{{ comment.username }}</a></span>
                   <span class="text-gray-500">• {{ comment.comment_date }}</span>
                 </p>
                 <p class="text-gray-700 mt-1">{{ comment.comment_text }}</p>

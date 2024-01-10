@@ -1,47 +1,53 @@
 {% extends "app/base.html" %}
 
 {% block title %}
-    Post Details
+    Profile Details
 {% endblock %}
 
 {% load static %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-100 flex">
-  
-<!-- <div class="min-h-screen bg-[#121212] text-white"> -->
-    {% include "app/navbar.html" %}
-    <main class="flex-1 pl-32 pr-32 pt-16"></main>
-      <div class="flex flex-col items-center space-y-4">
-        <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-          <img
-            class="aspect-square h-full w-full"
-            alt="Profile picture"
-            src="/static/profile_pictures/1eya4lVF_400x400.jpg?height=128&amp;width=128"
-          />
-        </span>
-        <div class="text-right">
-          <div class="text-lg font-semibold">admin</div>
-          <div class="text-sm">Mustafa Soner Işık</div>
-        </div>
-        <div class="space-y-2">
-          <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary-foreground h-10 px-4 py-2 bg-blue-600 hover:bg-blue-700">
-            Edit profile
-          </button>
-          <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary-foreground h-10 px-4 py-2 bg-blue-600 hover:bg-blue-700">
+  {% include "app/navbar.html" %}
+  <main class="flex-1 flex-col justify-center ml-64 mt-16">
+    <div class="flex items-center space-x-6 mb-6">
+      <span class="relative flex h-28 w-28 shrink-0 overflow-hidden rounded-full">
+        <img src="{% static user.profile_picture %}" alt="Profile Picture" class="h-full w-full object-cover" />
+      </span>
+      <div class="mt-2">
+        <h2 class="text-2xl font-semibold">{{ user.username }}</h2>
+        <p class="text-md text-gray-400 mb-2">{{ user.first_name }} {{ user.last_name }}</p>
+
+        <p class="text-lg text-gray-600">{{ user.bio }}</p>
+        <div class="mt-2 space-x-1">
+          {% if request.user.username == request.resolver_match.kwargs.username %}
+          <a href="{% url 'app:edit_profile' %}" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+              Edit profile
+          </a>
+      {% endif %}
+      
+          <button type="button" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
             View friends
           </button>
         </div>
-        <img
-          src="/static/profile_pictures/1eya4lVF_400x400.jpg"
-          alt="Profile Picture"
-          class="rounded-full"
-          width="128"
-          height="128"
-          style="aspect-ratio: 128 / 128; object-fit: cover;"
-        />
       </div>
     </div>
-  </div>
-</main>
+    <div class="flex flex-wrap -mx-1">
+    {% for post in user_posts %}
+        <div class="w-1/4 p-1 mr-4">
+          <a href="/post/{{ post.post_id }}">
+            <img
+                onclick=""
+                src="/{{ post.image }}"
+                alt="Post Image"
+                class="w-full h-full object-cover rounded-xl"
+                style="aspect-ratio: 1 / 1; object-fit: cover;"
+            />
+          </a>
+        </div>
+    {% endfor %}
+</div>
+
+  </main>
+</div>
   {% endblock %}
